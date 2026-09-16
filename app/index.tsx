@@ -6,17 +6,13 @@ import { Alert, Pressable, StyleSheet, View } from "react-native";
 import { BannerAdSlot } from "@/components/BannerAdSlot";
 import { Button, Screen, Text } from "@/components/ui";
 import { t, type TranslationKey } from "@/i18n";
+import { dayKeyOf } from "@/logic/day";
 import { CATEGORIES, FREE_CATEGORIES, presentOptions } from "@/logic/questions";
 import { useQuizStore } from "@/store/useQuizStore";
 import { usePremiumStore } from "@/store/usePremiumStore";
 import { useTheme, withAlpha } from "@/theme";
 
 const MIN_TOUCH_TARGET = 44;
-
-/** Local calendar day. Local, not UTC, so the cap resets at the player's midnight. */
-function dayKeyOf(date: Date): string {
-  return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, "0")}-${`${date.getDate()}`.padStart(2, "0")}`;
-}
 
 export default function Quiz() {
   const router = useRouter();
@@ -27,6 +23,7 @@ export default function Quiz() {
   const current = useQuizStore((s) => s.current);
   const chosenIndex = useQuizStore((s) => s.chosenIndex);
   const streak = useQuizStore((s) => s.streak);
+  const stats = useQuizStore((s) => s.stats);
   const startDay = useQuizStore((s) => s.startDay);
   const setCategory = useQuizStore((s) => s.setCategory);
   const next = useQuizStore((s) => s.next);
@@ -85,7 +82,10 @@ export default function Quiz() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <Screen scroll>
+      {/* topInset, because this route sets headerShown:false -- with no
+          navigation header above it, nothing else pays the notch, and the
+          title renders underneath the status bar. */}
+      <Screen scroll topInset>
         <View style={styles.titleRow}>
           <View style={{ flex: 1 }}>
             <Text variant="display">{t("appName")}</Text>
@@ -104,12 +104,22 @@ export default function Quiz() {
           />
         </View>
 
+        {/* Subject cards, not a chip strip.
+            Choosing the subject is what Quizburst is -- five categories, three
+            free, a record kept for each. That was rendered as a row of small
+            chips above the question, which made the screen a question with a
+            filter on it rather than a subject picker with a question under it.
+            The record the app already keeps per category was not shown at all.
+            Surfacing it is both the app's own feature and the thing that makes
+            this screen unmistakably not another daily-quiz app. */}
         <View
-          style={[styles.chips, { gap: spacing.sm, marginTop: spacing.md }]}
+          style={[styles.subjects, { gap: spacing.sm, marginTop: spacing.md }]}
         >
           {CATEGORIES.map((option) => {
             const locked = !isPremium && !FREE_CATEGORIES.includes(option.id);
             const name = t(option.nameKey as TranslationKey);
+            const stat = stats[option.id];
+            const selected = category === option.id;
             return (
               <Pressable
                 key={option.id}
@@ -117,20 +127,43 @@ export default function Quiz() {
                 accessibilityLabel={
                   locked ? t("categoryLocked", { name }) : name
                 }
-                accessibilityState={{ selected: category === option.id }}
+                accessibilityState={{ selected }}
                 onPress={() => pickCategory(option.id)}
                 style={{
-                  minHeight: MIN_TOUCH_TARGET,
+                  minWidth: 104,
+                  flexGrow: 1,
+                  flexBasis: "30%",
+                  minHeight: MIN_TOUCH_TARGET + 20,
                   justifyContent: "center",
                   paddingHorizontal: spacing.base,
-                  borderRadius: radius.full,
-                  backgroundColor: colors.surfaceAlt,
-                  borderWidth: category === option.id ? 2 : 1,
-                  borderColor:
-                    category === option.id ? colors.accent : colors.border,
+                  paddingVertical: spacing.sm,
+                  borderRadius: radius.lg,
+                  backgroundColor: selected
+                    ? withAlpha(colors.accent, 0.14)
+                    : colors.surfaceAlt,
+                  borderWidth: selected ? 2 : 1,
+                  borderColor: selected ? colors.accent : colors.border,
                 }}
               >
-                <Text variant="caption">{name}</Text>
+                <Text variant="bodyStrong">{name}</Text>
+                {/* A locked subject stays at full contrast and says so.
+                    Dimming it would be the defect check-ui-rules exists to
+                    catch: a locked row is information about what the unlock
+                    buys, not a disabled control, and greying it makes it
+                    harder to read exactly when the reader wants to read it. */}
+                {locked ? (
+                  <Text variant="micro" tone="accent">
+                    {t("proBadge")}
+                  </Text>
+                ) : null}
+                {/* A ratio, not a sentence: digits and a slash need no locale.
+                    An unplayed subject shows nothing rather than "0/0", which
+                    reads as a failure rather than as a subject not yet tried. */}
+                {stat && stat.answered > 0 ? (
+                  <Text variant="micro" tone="muted">
+                    {`${stat.correct}/${stat.answered}`}
+                  </Text>
+                ) : null}
               </Pressable>
             );
           })}
@@ -280,5 +313,5 @@ export default function Quiz() {
 
 const styles = StyleSheet.create({
   titleRow: { flexDirection: "row", alignItems: "center" },
-  chips: { flexDirection: "row", alignItems: "center", flexWrap: "wrap" },
+  subjects: { flexDirection: "row", alignItems: "stretch", flexWrap: "wrap" },
 });

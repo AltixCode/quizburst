@@ -6,6 +6,7 @@ import Home from '../index';
 import { testRouter } from './testRouter';
 import { renderWithProviders } from '@/components/__tests__/renderWithProviders';
 import { t } from '@/i18n';
+import { dayKeyOf } from '@/logic/day';
 import { FREE_CATEGORIES, presentOptions, questionsIn } from '@/logic/questions';
 import { useAdsConsentStore } from '@/store/useAdsConsentStore';
 import { FREE_DAILY, useQuizStore } from '@/store/useQuizStore';
@@ -80,7 +81,7 @@ describe('the quiz screen', () => {
 
   it('stops a free player at the daily cap and offers the purchase', async () => {
     useQuizStore.setState({
-      todayKey: '2026-09-15',
+      todayKey: dayKeyOf(new Date()),
       answeredToday: questionsIn(FREE).slice(0, FREE_DAILY).map((q) => q.id),
     });
     const { getByText } = await renderWithProviders(<Home />);
@@ -94,7 +95,7 @@ describe('the quiz screen', () => {
   it('distinguishes an emptied category from the daily cap', async () => {
     usePremiumStore.setState({ isPremium: true });
     useQuizStore.setState({
-      todayKey: '2026-09-15',
+      todayKey: dayKeyOf(new Date()),
       answeredToday: questionsIn(FREE).map((q) => q.id),
     });
     const { getByText } = await renderWithProviders(<Home />);

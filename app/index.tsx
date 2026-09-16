@@ -6,17 +6,13 @@ import { Alert, Pressable, StyleSheet, View } from "react-native";
 import { BannerAdSlot } from "@/components/BannerAdSlot";
 import { Button, Screen, Text } from "@/components/ui";
 import { t, type TranslationKey } from "@/i18n";
+import { dayKeyOf } from "@/logic/day";
 import { CATEGORIES, FREE_CATEGORIES, presentOptions } from "@/logic/questions";
 import { useQuizStore } from "@/store/useQuizStore";
 import { usePremiumStore } from "@/store/usePremiumStore";
 import { useTheme, withAlpha } from "@/theme";
 
 const MIN_TOUCH_TARGET = 44;
-
-/** Local calendar day. Local, not UTC, so the cap resets at the player's midnight. */
-function dayKeyOf(date: Date): string {
-  return `${date.getFullYear()}-${`${date.getMonth() + 1}`.padStart(2, "0")}-${`${date.getDate()}`.padStart(2, "0")}`;
-}
 
 export default function Quiz() {
   const router = useRouter();
@@ -85,7 +81,10 @@ export default function Quiz() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <Screen scroll>
+      {/* topInset, because this route sets headerShown:false -- with no
+          navigation header above it, nothing else pays the notch, and the
+          title renders underneath the status bar. */}
+      <Screen scroll topInset>
         <View style={styles.titleRow}>
           <View style={{ flex: 1 }}>
             <Text variant="display">{t("appName")}</Text>

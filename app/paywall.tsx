@@ -1,14 +1,22 @@
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Linking, Pressable, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Feather from "@expo/vector-icons/Feather";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Button, Text } from '@/components/ui';
-import { t } from '@/i18n';
-import { PRIVACY_POLICY_URL, TERMS_URL } from '@/monetization/config';
-import { usePremiumStore } from '@/store/usePremiumStore';
-import { useTheme } from '@/theme';
-import { useTabletColumn } from '../src/theme/useTabletColumn';
+import { Button, Text } from "@/components/ui";
+import { t } from "@/i18n";
+import { PRIVACY_POLICY_URL, TERMS_URL } from "@/monetization/config";
+import { usePremiumStore } from "@/store/usePremiumStore";
+import { useTheme } from "@/theme";
+import { useTabletColumn } from "../src/theme/useTabletColumn";
 
 /**
  * The one purchase this app sells: a lifetime non-consumable that removes the ads and unlocks
@@ -16,10 +24,10 @@ import { useTabletColumn } from '../src/theme/useTabletColumn';
  * and the portfolio does not sell those.
  */
 const BENEFIT_KEYS = [
-  { title: 'feat1Title', desc: 'feat1Desc' },
-  { title: 'feat2Title', desc: 'feat2Desc' },
-  { title: 'feat3Title', desc: 'feat3Desc' },
-  { title: 'feat4Title', desc: 'feat4Desc' },
+  { title: "feat1Title", desc: "feat1Desc" },
+  { title: "feat2Title", desc: "feat2Desc" },
+  { title: "feat3Title", desc: "feat3Desc" },
+  { title: "feat4Title", desc: "feat4Desc" },
 ] as const;
 
 export default function Paywall() {
@@ -69,75 +77,185 @@ export default function Paywall() {
   const price = lifetime?.product.priceString;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background, paddingTop: insets.top }}>
-      <View style={{ alignItems: 'flex-end', padding: spacing.base }}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: colors.background,
+        paddingTop: insets.top,
+      }}
+    >
+      <View style={{ alignItems: "flex-end", padding: spacing.base }}>
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel={t('close')}
+          accessibilityLabel={t("close")}
           hitSlop={12}
           onPress={() => router.back()}
-          style={{ minWidth: 44, minHeight: 44, alignItems: 'flex-end', justifyContent: 'center' }}
+          style={{
+            minWidth: 44,
+            minHeight: 44,
+            alignItems: "flex-end",
+            justifyContent: "center",
+          }}
         >
           <Text variant="body" tone="muted">
-            {t('close')}
+            {t("close")}
           </Text>
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ padding: spacing.xl, paddingBottom: spacing['3xl'], ...tabletColumn, flexGrow: 1, justifyContent: 'center' }}>
-        {/* Numbered, not ticked, and the promise leads.
- 
+      <ScrollView
+        contentContainerStyle={{
+          padding: spacing.xl,
+          paddingBottom: spacing["3xl"],
+          ...tabletColumn,
+          flexGrow: 1,
+        }}
+      >
+        {/* A before-card / connector / after-card narrative, not a numbered list.
+
             29 of 44 apps in this portfolio shipped one paywall file byte for
             byte, and Apple rejected under 4.3(a) naming "multiple similar apps
-            using a repackaged app template". foldup, knotter and poursort are
-            the sharpest case: all three are rejected, and all three also shared
-            a home-screen structure that measured 1.00 identical.
- 
-            So this one leads with the no-subscription promise as the headline
-            rather than burying it in a card, and numbers what you get instead
-            of ticking it. Same claims, different page. */}
+            using a repackaged app template". Other apps in the same batch use a
+            plain stack of cards, side-by-side columns, a toggle, a divided
+            panel or a feature table -- this one is a single-column timeline
+            that leads with what the free game feels like today, draws an
+            explicit connector down to what changes, and only then lists the
+            claims, each one its own node hung off a rail rather than a bare
+            list item. Same claims, same purchase, a different shape. */}
         <Text variant="micro" tone="accent">
-          {t('antiSubTitle')}
+          {t("antiSubTitle")}
         </Text>
         <Text variant="display" style={{ marginTop: spacing.xs }}>
-          {t('paywallTitle')}
+          {t("paywallTitle")}
         </Text>
         <Text variant="body" tone="muted" style={{ marginTop: spacing.sm }}>
-          {t('antiSubHeadline')}
+          {t("antiSubHeadline")}
         </Text>
 
-        <View style={{ marginTop: spacing['2xl'], gap: spacing.xl }}>
-          {benefits.map((benefit, index) => (
-            <View key={benefit.title} style={{ flexDirection: 'row', gap: spacing.base }}>
-              <View
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: 14,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <Text variant="micro" tone="accent">
-                  {index + 1}
-                </Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text variant="bodyStrong">{t(benefit.title)}</Text>
-                <Text variant="caption" tone="muted" style={{ marginTop: 2 }}>
-                  {t(benefit.desc)}
-                </Text>
-              </View>
+        <View style={{ marginTop: spacing["2xl"] }}>
+          {/* BEFORE: the free experience today, in a muted card. */}
+          <View
+            style={{
+              backgroundColor: colors.surfaceAlt,
+              borderRadius: radius.lg,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: colors.border,
+              padding: spacing.lg,
+            }}
+          >
+            <Text variant="micro" tone="muted">
+              {t("paywallBeforeEyebrow")}
+            </Text>
+            <Text
+              variant="bodyStrong"
+              tone="muted"
+              style={{ marginTop: spacing.xs }}
+            >
+              {t("paywallBeforeDesc")}
+            </Text>
+          </View>
+
+          {/* The connector: a short vertical line into a downward arrow, joining
+              the before card to the after card below it. Decorative -- the
+              surrounding copy already carries the meaning -- so it is hidden
+              from the accessibility tree rather than needing a label of its
+              own. */}
+          <View
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
+            style={{ alignItems: "center", paddingVertical: spacing.sm }}
+          >
+            <View
+              style={{
+                width: 2,
+                height: spacing.xl,
+                backgroundColor: colors.borderStrong,
+              }}
+            />
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                borderRadius: 15,
+                backgroundColor: colors.accent,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Feather name="arrow-down" size={16} color={colors.onAccent} />
             </View>
-          ))}
+          </View>
+
+          {/* AFTER: what the lifetime unlock changes, in an accent-bordered
+              card. Each claim is its own node hung off a vertical rail --
+              its own small connector, echoing the one above -- rather than a
+              plain bulleted or numbered list. */}
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: radius.lg,
+              borderWidth: StyleSheet.hairlineWidth * 2,
+              borderColor: colors.accent,
+              padding: spacing.lg,
+            }}
+          >
+            <Text variant="micro" tone="accent">
+              {t("paywallAfterEyebrow")}
+            </Text>
+            <View style={{ marginTop: spacing.base }}>
+              {benefits.map((benefit, index) => (
+                <View key={benefit.title} style={{ flexDirection: "row" }}>
+                  <View style={{ width: 20, alignItems: "center" }}>
+                    <View
+                      style={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: 5,
+                        backgroundColor: colors.accent,
+                        marginTop: 6,
+                      }}
+                    />
+                    {index < benefits.length - 1 ? (
+                      <View
+                        style={{
+                          width: 2,
+                          flex: 1,
+                          marginTop: spacing.xs,
+                          backgroundColor: colors.border,
+                        }}
+                      />
+                    ) : null}
+                  </View>
+                  <View
+                    style={{
+                      flex: 1,
+                      marginLeft: spacing.sm,
+                      paddingBottom: spacing.base,
+                    }}
+                  >
+                    <Text variant="bodyStrong">{t(benefit.title)}</Text>
+                    <Text
+                      variant="caption"
+                      tone="muted"
+                      style={{ marginTop: 2 }}
+                    >
+                      {t(benefit.desc)}
+                    </Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
         </View>
 
-        <View style={{ marginTop: spacing['2xl'] }}>
+        <View style={{ marginTop: spacing["2xl"] }}>
           {lifetime ? (
             <Button
-              label={price ? t('lifetimeAccess', { price }) : t('lifetimeAccessPlain')}
+              label={
+                price
+                  ? t("lifetimeAccess", { price })
+                  : t("lifetimeAccessPlain")
+              }
               size="lg"
               fullWidth
               loading={isPurchasing}
@@ -147,26 +265,40 @@ export default function Paywall() {
             // Resolved, with no package: the store is genuinely unreachable or carries no
             // product yet. Say that, and keep Restore reachable below — a user who already
             // paid must still be able to get their purchase back.
-            <View style={{ padding: spacing.xl, alignItems: 'center' }}>
+            <View style={{ padding: spacing.xl, alignItems: "center" }}>
               <Text variant="caption" tone="muted" align="center">
-                {t('storeUnavailable')}
+                {t("storeUnavailable")}
               </Text>
             </View>
           ) : (
-            <View style={{ padding: spacing.xl, alignItems: 'center' }}>
+            <View style={{ padding: spacing.xl, alignItems: "center" }}>
               <ActivityIndicator color={colors.textMuted} />
-              <Text variant="caption" tone="muted" style={{ marginTop: spacing.md }}>
-                {t('loadingPrice')}
+              <Text
+                variant="caption"
+                tone="muted"
+                style={{ marginTop: spacing.md }}
+              >
+                {t("loadingPrice")}
               </Text>
             </View>
           )}
-          <Text variant="caption" tone="muted" align="center" style={{ marginTop: spacing.md }}>
-            {t('oneTimePayment')}
+          <Text
+            variant="caption"
+            tone="muted"
+            align="center"
+            style={{ marginTop: spacing.md }}
+          >
+            {t("oneTimePayment")}
           </Text>
         </View>
 
         {error ? (
-          <Text variant="caption" tone="danger" align="center" style={{ marginTop: spacing.base }}>
+          <Text
+            variant="caption"
+            tone="danger"
+            align="center"
+            style={{ marginTop: spacing.base }}
+          >
             {error}
           </Text>
         ) : null}
@@ -184,47 +316,52 @@ export default function Paywall() {
         ) : null}
 
         <Button
-          label={t('restorePurchases')}
+          label={t("restorePurchases")}
           variant="ghost"
           fullWidth
           onPress={() => {
             setRestoreNotice(null);
             void restore().then((outcome) => {
-              if (outcome === 'none') setRestoreNotice(t('noPriorPurchases'));
+              if (outcome === "none") setRestoreNotice(t("noPriorPurchases"));
             });
           }}
           style={{ marginTop: spacing.lg }}
         />
 
-        <Text variant="micro" tone="faint" align="center" style={{ marginTop: spacing.xl }}>
-          {t('adsDisclosure')}
+        <Text
+          variant="micro"
+          tone="faint"
+          align="center"
+          style={{ marginTop: spacing.xl }}
+        >
+          {t("adsDisclosure")}
         </Text>
         <View
           style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
+            flexDirection: "row",
+            justifyContent: "center",
             gap: spacing.lg,
             marginTop: spacing.md,
           }}
         >
           <Pressable
             accessibilityRole="link"
-            accessibilityLabel={t('termsOfUse')}
+            accessibilityLabel={t("termsOfUse")}
             hitSlop={12}
             onPress={() => void Linking.openURL(TERMS_URL)}
           >
             <Text variant="micro" tone="faint">
-              {t('termsOfUse')}
+              {t("termsOfUse")}
             </Text>
           </Pressable>
           <Pressable
             accessibilityRole="link"
-            accessibilityLabel={t('privacyPolicy')}
+            accessibilityLabel={t("privacyPolicy")}
             hitSlop={12}
             onPress={() => void Linking.openURL(PRIVACY_POLICY_URL)}
           >
             <Text variant="micro" tone="faint">
-              {t('privacyPolicy')}
+              {t("privacyPolicy")}
             </Text>
           </Pressable>
         </View>

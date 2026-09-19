@@ -1,0 +1,35 @@
+{
+  "identifier": "1310E422-3D7C-43E2-B92F-AFD939584B9F",
+  "nonRenewingSubscriptions": [],
+  "products": [
+    {
+      "displayPrice": "4.99",
+      "familyShareable": false,
+      "internalID": "846F4410-0389-49A8-8825-7DDF75209DD4",
+      "localizations": [
+        {
+          "description": "quizburst remove ads lifetime unlock",
+          "displayName": "quizburst remove ads",
+          "locale": "en_US"
+        }
+      ],
+      "productID": "com.altixcode.quizburst.removeads",
+      "referenceName": "quizburst remove ads",
+      "type": "NonConsumable"
+    }
+  ],
+  "settings": {
+    "_applicationInternalID": "",
+    "_developerTeamID": "",
+    "_failTransactionsEnabled": false,
+    "_lastSynchronizedDate": 0,
+    "_locale": "en_US",
+    "_storefront": "USA",
+    "_storeKitErrors": []
+  },
+  "subscriptionGroups": [],
+  "version": {
+    "major": 4,
+    "minor": 0
+  }
+}

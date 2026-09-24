@@ -8,6 +8,7 @@ import { Button, Screen, Text } from "@/components/ui";
 import { t, type TranslationKey } from "@/i18n";
 import { dayKeyOf } from "@/logic/day";
 import { CATEGORIES, FREE_CATEGORIES, presentOptions } from "@/logic/questions";
+import { useContentPoolStore } from "@/store/useContentPoolStore";
 import { useQuizStore } from "@/store/useQuizStore";
 import { usePremiumStore } from "@/store/usePremiumStore";
 import { useTheme, withAlpha } from "@/theme";
@@ -29,6 +30,7 @@ export default function Quiz() {
   const next = useQuizStore((s) => s.next);
   const submit = useQuizStore((s) => s.submit);
   const remaining = useQuizStore((s) => s.remainingToday)(isPremium);
+  const refreshContentPool = useContentPoolStore((s) => s.refresh);
 
   const [blocked, setBlocked] = useState<"daily-cap" | "category-done" | null>(
     null,
@@ -40,6 +42,12 @@ export default function Quiz() {
   useEffect(() => {
     startDay(dayKeyOf(today));
   }, [startDay, today]);
+
+  // Launch-time only: a full-sync pool has no per-day cadence to poll for
+  // during a session, so this runs once and leaves the bank alone after.
+  useEffect(() => {
+    void refreshContentPool();
+  }, [refreshContentPool]);
 
   const shown = current ? presentOptions(current) : null;
 

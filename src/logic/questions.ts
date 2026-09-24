@@ -263,11 +263,30 @@ export const QUESTIONS: Question[] = [
   ]),
 ];
 
+/**
+ * The pool `questionsIn`/`questionById` actually read from. Defaults to the
+ * bundled `QUESTIONS`; `setActivePool` (called from `src/content`, never
+ * from here) swaps in the content-drip service's synced set. Kept as a
+ * plain module-level variable rather than a parameter so every existing
+ * call site keeps working unchanged — this file still imports nothing from
+ * react, react-native or expo-*.
+ */
+let activePool: Question[] = QUESTIONS;
+
+export function setActivePool(pool: Question[]): void {
+  activePool = pool;
+}
+
+/** Test-only: restores the bundled bank as the active pool. */
+export function resetActivePool(): void {
+  activePool = QUESTIONS;
+}
+
 export const questionsIn = (category: string): Question[] =>
-  QUESTIONS.filter((q) => q.category === category);
+  activePool.filter((q) => q.category === category);
 
 export const questionById = (id: string): Question | undefined =>
-  QUESTIONS.find((q) => q.id === id);
+  activePool.find((q) => q.id === id);
 
 /** Whether a player may open a category. */
 export function canUseCategory(category: string, isPremium: boolean): boolean {
